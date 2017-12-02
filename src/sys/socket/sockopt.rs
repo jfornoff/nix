@@ -127,6 +127,7 @@ macro_rules! sockopt_impl {
  * ===== Define sockopts =====
  *
  */
+
 #[derive(Copy, Clone, Debug)]
 pub struct TCPInfoData {
     tcpi_state: u8,
@@ -135,8 +136,7 @@ pub struct TCPInfoData {
     tcpi_probes: u8,
     tcpi_backoff: u8,
     tcpi_options: u8,
-    tcpi_snd_wscale: u8,
-    tcpi_rcv_wscale: u8,
+    windowscalesbitfield-dontcare: u8,
     tcpi_delivery_rate_app_limited: u8,
     tcpi_rto: u32,
     tcpi_ato: u32,
