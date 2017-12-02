@@ -136,7 +136,7 @@ pub struct TCPInfoData {
     tcpi_probes: u8,
     tcpi_backoff: u8,
     tcpi_options: u8,
-    windowscalesbitfield-dontcare: u8,
+    windowscalesbitfielddontcare: u8,
     tcpi_delivery_rate_app_limited: u8,
     tcpi_rto: u32,
     tcpi_ato: u32,
