@@ -127,6 +127,7 @@ macro_rules! sockopt_impl {
  * ===== Define sockopts =====
  *
  */
+#[derive(Copy, Clone, Debug)]
 pub struct TCPInfoData {
     tcpi_state: u8,
     tcpi_ca_state: u8,
@@ -174,7 +175,12 @@ pub struct TCPInfoData {
     tcpi_delivery_rate: u64,
 }
 
+#[cfg(any(target_os = "macos", target_os = "ios"))]
+const TCP_INFO: ::libc::c_int = 0x200;
+
+#[cfg(target_os = "linux")]
 const TCP_INFO: ::libc::c_int = 11;
+
 sockopt_impl!(Both, ReuseAddr, libc::SOL_SOCKET, libc::SO_REUSEADDR, bool);
 sockopt_impl!(Both, ReusePort, libc::SOL_SOCKET, libc::SO_REUSEPORT, bool);
 sockopt_impl!(Both, TcpNoDelay, libc::IPPROTO_TCP, libc::TCP_NODELAY, bool);
