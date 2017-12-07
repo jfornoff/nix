@@ -37,13 +37,14 @@
 //! An example showing some of the basic operations for interacting with the control flags:
 //!
 //! ```
-//! # use self::nix::sys::termios::{CS5, CSIZE, Termios};
+//! # use self::nix::sys::termios::{ControlFlags, Termios};
 //! # let mut termios = unsafe { Termios::default_uninit() };
-//! termios.control_flags & CSIZE == CS5;
-//! termios.control_flags |= CS5;
+//! termios.control_flags & ControlFlags::CSIZE == ControlFlags::CS5;
+//! termios.control_flags |= ControlFlags::CS5;
 //! ```
 
-use {Errno, Result};
+use Result;
+use errno::Errno;
 use libc::{self, c_int, tcflag_t};
 use std::cell::{Ref, RefCell};
 use std::convert::From;

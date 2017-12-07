@@ -122,8 +122,7 @@ pub fn test_scm_rights() {
     use nix::unistd::{pipe, read, write, close};
     use nix::sys::socket::{socketpair, sendmsg, recvmsg,
                            AddressFamily, SockType, SockFlag,
-                           ControlMessage, CmsgSpace, MsgFlags,
-                           MSG_TRUNC, MSG_CTRUNC};
+                           ControlMessage, CmsgSpace, MsgFlags};
 
     let (fd1, fd2) = socketpair(AddressFamily::Unix, SockType::Stream, None, SockFlag::empty())
                      .unwrap();
@@ -154,7 +153,7 @@ pub fn test_scm_rights() {
                 panic!("unexpected cmsg");
             }
         }
-        assert!(!msg.flags.intersects(MSG_TRUNC | MSG_CTRUNC));
+        assert!(!msg.flags.intersects(MsgFlags::MSG_TRUNC | MsgFlags::MSG_CTRUNC));
         close(fd2).unwrap();
     }
 
@@ -178,8 +177,7 @@ pub fn test_sendmsg_empty_cmsgs() {
     use nix::unistd::close;
     use nix::sys::socket::{socketpair, sendmsg, recvmsg,
                            AddressFamily, SockType, SockFlag,
-                           CmsgSpace, MsgFlags,
-                           MSG_TRUNC, MSG_CTRUNC};
+                           CmsgSpace, MsgFlags};
 
     let (fd1, fd2) = socketpair(AddressFamily::Unix, SockType::Stream, None, SockFlag::empty())
                      .unwrap();
@@ -199,7 +197,7 @@ pub fn test_sendmsg_empty_cmsgs() {
         for _ in msg.cmsgs() {
             panic!("unexpected cmsg");
         }
-        assert!(!msg.flags.intersects(MSG_TRUNC | MSG_CTRUNC));
+        assert!(!msg.flags.intersects(MsgFlags::MSG_TRUNC | MsgFlags::MSG_CTRUNC));
         close(fd2).unwrap();
     }
 }
@@ -244,7 +242,8 @@ pub fn test_unixdomain() {
 #[cfg(any(target_os = "macos", target_os = "ios"))]
 #[test]
 pub fn test_syscontrol() {
-    use nix::{Errno, Error};
+    use nix::Error;
+    use nix::errno::Errno;
     use nix::sys::socket::{AddressFamily, socket, SockAddr, SockType, SockFlag, SockProtocol};
 
     let fd = socket(AddressFamily::System, SockType::Datagram,

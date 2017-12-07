@@ -1,7 +1,8 @@
 //! Socket interface functions
 //!
 //! [Further reading](http://man7.org/linux/man-pages/man7/socket.7.html)
-use {Error, Errno, Result};
+use {Error, Result};
+use errno::Errno;
 use features;
 use libc::{self, c_void, c_int, socklen_t, size_t, pid_t, uid_t, gid_t};
 use std::{mem, ptr, slice};
@@ -571,16 +572,16 @@ pub fn socket<T: Into<Option<SockProtocol>>>(domain: AddressFamily, ty: SockType
               target_os = "netbsd",
               target_os = "openbsd"))]
     {
-        use fcntl::{fcntl, FD_CLOEXEC, O_NONBLOCK};
+        use fcntl::{fcntl, FdFlag, OFlag};
         use fcntl::FcntlArg::{F_SETFD, F_SETFL};
 
         if !feat_atomic {
-            if flags.contains(SOCK_CLOEXEC) {
-                try!(fcntl(res, F_SETFD(FD_CLOEXEC)));
+            if flags.contains(SockFlag::SOCK_CLOEXEC) {
+                try!(fcntl(res, F_SETFD(FdFlag::FD_CLOEXEC)));
             }
 
-            if flags.contains(SOCK_NONBLOCK) {
-                try!(fcntl(res, F_SETFL(O_NONBLOCK)));
+            if flags.contains(SockFlag::SOCK_NONBLOCK) {
+                try!(fcntl(res, F_SETFL(OFlag::O_NONBLOCK)));
             }
         }
     }
@@ -616,18 +617,18 @@ pub fn socketpair<T: Into<Option<SockProtocol>>>(domain: AddressFamily, ty: Sock
               target_os = "netbsd",
               target_os = "openbsd"))]
     {
-        use fcntl::{fcntl, FD_CLOEXEC, O_NONBLOCK};
+        use fcntl::{fcntl, FdFlag, OFlag};
         use fcntl::FcntlArg::{F_SETFD, F_SETFL};
 
         if !feat_atomic {
-            if flags.contains(SOCK_CLOEXEC) {
-                try!(fcntl(fds[0], F_SETFD(FD_CLOEXEC)));
-                try!(fcntl(fds[1], F_SETFD(FD_CLOEXEC)));
+            if flags.contains(SockFlag::SOCK_CLOEXEC) {
+                try!(fcntl(fds[0], F_SETFD(FdFlag::FD_CLOEXEC)));
+                try!(fcntl(fds[1], F_SETFD(FdFlag::FD_CLOEXEC)));
             }
 
-            if flags.contains(SOCK_NONBLOCK) {
-                try!(fcntl(fds[0], F_SETFL(O_NONBLOCK)));
-                try!(fcntl(fds[1], F_SETFL(O_NONBLOCK)));
+            if flags.contains(SockFlag::SOCK_NONBLOCK) {
+                try!(fcntl(fds[0], F_SETFL(OFlag::O_NONBLOCK)));
+                try!(fcntl(fds[1], F_SETFL(OFlag::O_NONBLOCK)));
             }
         }
     }
@@ -698,15 +699,15 @@ fn accept4_polyfill(sockfd: RawFd, flags: SockFlag) -> Result<RawFd> {
               target_os = "netbsd",
               target_os = "openbsd"))]
     {
-        use fcntl::{fcntl, FD_CLOEXEC, O_NONBLOCK};
+        use fcntl::{fcntl, FdFlag, OFlag};
         use fcntl::FcntlArg::{F_SETFD, F_SETFL};
 
-        if flags.contains(SOCK_CLOEXEC) {
-            try!(fcntl(res, F_SETFD(FD_CLOEXEC)));
+        if flags.contains(SockFlag::SOCK_CLOEXEC) {
+            try!(fcntl(res, F_SETFD(FdFlag::FD_CLOEXEC)));
         }
 
-        if flags.contains(SOCK_NONBLOCK) {
-            try!(fcntl(res, F_SETFL(O_NONBLOCK)));
+        if flags.contains(SockFlag::SOCK_NONBLOCK) {
+            try!(fcntl(res, F_SETFL(OFlag::O_NONBLOCK)));
         }
     }
 
