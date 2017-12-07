@@ -129,6 +129,7 @@ macro_rules! sockopt_impl {
  *
  */
 
+#[repr(C)]
 #[derive(Copy, Clone, Debug)]
 pub struct TCPInfoData {
     tcpi_state: u8,
@@ -176,16 +177,55 @@ pub struct TCPInfoData {
     tcpi_delivery_rate: u64,
 }
 
+#[repr(C)]
+#[derive(Copy, Clone, Debug)]
+pub struct MPTCPInfoData {
+    tcp_info_len: u32,
+    sub_len: u32,
+    meta_len: u32,
+    sub_info_len: u32,
+    total_sub_info_len: u32,
+
+    meta_info: u8,
+    initial: u8,
+    subflows: u8,
+    subflow_info: u8,
+}
+
+pub struct MPTCPMetaInfoData {
+    mptcpi_state: u8,
+    mptcpi_retransmits: u8,
+    mptcpi_probes: u8,
+    mptcpi_backoff: u8,
+
+    mptcpi_rto: u32,
+    mptcpi_unacked: u32,
+
+    mptcpi_last_data_sent: u32,
+    mptcpi_last_data_recv: u32,
+    mptcpi_last_ack_recv: u32,
+
+    mptcpi_total_retrans: u32,
+
+    mptcpi_bytes_acked: u64,
+    mptcpi_bytes_received: u64,
+}
+
+
 #[cfg(any(target_os = "macos", target_os = "ios"))]
 const TCP_INFO: ::libc::c_int = 0x200;
 
 #[cfg(target_os = "linux")]
 const TCP_INFO: ::libc::c_int = 11;
+const MPTCP_ENABLED: ::libc::c_int = 42;
+const MPTCP_INFO: ::libc::c_int = 45;
 
 sockopt_impl!(Both, ReuseAddr, libc::SOL_SOCKET, libc::SO_REUSEADDR, bool);
 sockopt_impl!(Both, ReusePort, libc::SOL_SOCKET, libc::SO_REUSEPORT, bool);
 sockopt_impl!(Both, TcpNoDelay, libc::IPPROTO_TCP, libc::TCP_NODELAY, bool);
 sockopt_impl!(GetOnly, TcpInfo, libc::IPPROTO_TCP, TCP_INFO, TCPInfoData);
+sockopt_impl!(GetOnly, MptcpInfo, libc::IPPROTO_TCP, MPTCP_INFO, MPTCPInfoData);
+sockopt_impl!(Both, MptcpEnabled, libc::IPPROTO_TCP, MPTCP_ENABLED, bool);
 sockopt_impl!(
     Both,
     Linger,
